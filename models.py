@@ -31,13 +31,12 @@ def create_modules(block_list):
         # Check all different types and create layers for them
         
         if block["type"] == "convolutional":
-            
             try:
                 batch_normalization = int(block["batch_normalize"])
-                bias = True
+                bias = False
             except:
                 batch_normalization = 0
-                bias = False
+                bias = True
             
             filters = int(block["filters"])
             kernel_size = int(block["size"])
@@ -142,7 +141,6 @@ class YOLOLayer(nn.Module):
         self.ignore_thresh = ignore_thresh #0.5
         self.truth_thresh = truth_thresh
         self.random = random
-        
         self.mse_loss = nn.MSELoss()
         self.bce_loss = nn.BCELoss()
         self.obj_scale = 1
@@ -268,8 +266,8 @@ class Darknet(nn.Module):
 class Darknet(nn.Module):
     def __init__(self, cfg_file, img_size = 416):
         super(Darknet, self).__init__()
-        self.block_list = parse_cfg_file(cfg_file)
-        self.net_info, self.module_list = create_modules(self.block_list)
+        self.module_defs = parse_cfg_file(cfg_file)
+        self.net_info, self.module_list = create_modules(self.module_defs)
         self.img_size = img_size
 
         self.yolo_layers = [layer[0] for layer in self.module_list if hasattr(layer[0], "metrics")]
@@ -285,10 +283,10 @@ class Darknet(nn.Module):
             if module_def["type"] in ["convolutional", "upsample", "maxpool"]:
                 x = module(x)
             elif module_def["type"] == "route":
-            	# Concatenates the given layers along the depth dimension
+                # Concatenates the given layers along the depth dimension
                 x = torch.cat([layer_outputs[int(layer_i)] for layer_i in module_def["layers"].split(",")], 1)
             elif module_def["type"] == "shortcut":
-            	# Adds the "from"-layer to the previous layer
+                # Adds the "from"-layer to the previous layer
                 layer_i = int(module_def["from"])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
             elif module_def["type"] == "yolo":
@@ -320,7 +318,15 @@ class Darknet(nn.Module):
                 break
             if module_def["type"] == "convolutional":
                 conv_layer = module[0]
-                if module_def["batch_normalize"]:
+                print(module_def)
+                if conv_layer.bias is not None:
+                    # Load conv. bias
+                    num_b = conv_layer.bias.numel()
+                    conv_b = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(conv_layer.bias)
+                    conv_layer.bias.data.copy_(conv_b)
+                    ptr += num_b
+                else:
+                    # Batch normalize
                     # Load BN bias, weights, running mean and running variance
                     bn_layer = module[1]
                     num_b = bn_layer.bias.numel()  # Number of biases
@@ -340,12 +346,7 @@ class Darknet(nn.Module):
                     bn_rv = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(bn_layer.running_var)
                     bn_layer.running_var.data.copy_(bn_rv)
                     ptr += num_b
-                else:
-                    # Load conv. bias
-                    num_b = conv_layer.bias.numel()
-                    conv_b = torch.from_numpy(weights[ptr : ptr + num_b]).view_as(conv_layer.bias)
-                    conv_layer.bias.data.copy_(conv_b)
-                    ptr += num_b
+                    
                 # Load conv. weights
                 num_w = conv_layer.weight.numel()
                 conv_w = torch.from_numpy(weights[ptr : ptr + num_w]).view_as(conv_layer.weight)
