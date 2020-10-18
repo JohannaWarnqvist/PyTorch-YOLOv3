@@ -6,7 +6,8 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 
-from utils.parse_config import *
+#from utils.parse_config import *
+import utils.parse_cfg_file
 from utils.utils import build_targets, to_cpu, non_max_suppression
 
 import matplotlib.pyplot as plt
@@ -377,3 +378,15 @@ class Darknet(nn.Module):
                 conv_layer.weight.data.cpu().numpy().tofile(fp)
 
         fp.close()
+
+    def custom_model(self, num_classes):
+        """Create changes in the model to adjust the model to a different dataset. 
+        Args: num_classes is th number of classes in the new dataset."""
+        
+        for i, block in zip(range(len(self.block_list[1:])), self.block_list[1:]):
+            if block["type"] == "yolo":        
+                #Change number of classes in YOLO layer
+                self.module_list[i][0].num_classes = num_classes
+                #Change number of filters in conv layer previous of YOLO layer
+                self.module_list[i-1][0].out_channels = (num_classes + 5) * 3
+
