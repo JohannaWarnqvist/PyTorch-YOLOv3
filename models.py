@@ -7,7 +7,7 @@ from torch.autograd import Variable
 import numpy as np
 
 #from utils.parse_config import *
-import utils.parse_cfg_file
+from utils.parse_cfg_file import *
 from utils.utils import build_targets, to_cpu, non_max_suppression
 
 import matplotlib.pyplot as plt
