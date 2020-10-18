@@ -141,8 +141,7 @@ class YOLOLayer(nn.Module):
         self.ignore_thresh = ignore_thresh #0.5
         self.truth_thresh = truth_thresh
         self.random = random
-        
-		self.mse_loss = nn.MSELoss()
+        self.mse_loss = nn.MSELoss()
         self.bce_loss = nn.BCELoss()
         self.obj_scale = 1
         self.noobj_scale = 100
@@ -267,8 +266,8 @@ class Darknet(nn.Module):
 class Darknet(nn.Module):
     def __init__(self, cfg_file, img_size = 416):
         super(Darknet, self).__init__()
-        self.block_list = parse_cfg_file(cfg_file)
-        self.net_info, self.module_list = create_modules(self.block_list)
+        self.module_defs = parse_model_config(cfg_file)#parse_cfg_file(cfg_file)
+        self.net_info, self.module_list = create_modules(self.module_defs)
         self.img_size = img_size
 
         self.yolo_layers = [layer[0] for layer in self.module_list if hasattr(layer[0], "metrics")]
@@ -284,10 +283,10 @@ class Darknet(nn.Module):
             if module_def["type"] in ["convolutional", "upsample", "maxpool"]:
                 x = module(x)
             elif module_def["type"] == "route":
-            	# Concatenates the given layers along the depth dimension
+                # Concatenates the given layers along the depth dimension
                 x = torch.cat([layer_outputs[int(layer_i)] for layer_i in module_def["layers"].split(",")], 1)
             elif module_def["type"] == "shortcut":
-            	# Adds the "from"-layer to the previous layer
+                # Adds the "from"-layer to the previous layer
                 layer_i = int(module_def["from"])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
             elif module_def["type"] == "yolo":
