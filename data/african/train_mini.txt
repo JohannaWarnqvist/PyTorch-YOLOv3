@@ -1,0 +1,8 @@
+data\african_mini\images\buffalo_001.jpg
+data\african_mini\images\buffalo_002.jpg
+data\african_mini\images\elephant_001.jpg
+data\african_mini\images\elephant_002.jpg
+data\african_mini\images\rhino_001.jpg
+data\african_mini\images\rhino_002.jpg
+data\african_mini\images\zebra_001.jpg
+data\african_mini\images\zebra_002.jpg
