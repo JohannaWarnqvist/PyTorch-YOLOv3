@@ -86,8 +86,13 @@ if __name__ == "__main__":
         # Load checkpoint weights
         model.load_state_dict(torch.load(opt.weights_path))
 
+    if len(class_names) != 80:
+        model.custom_model(len(class_names))
+
+
     print("Compute mAP...")
 
+    batch_size=8
     precision, recall, AP, f1, ap_class = evaluate(
         model,
         path=valid_path,
@@ -95,7 +100,7 @@ if __name__ == "__main__":
         conf_thres=opt.conf_thres,
         nms_thres=opt.nms_thres,
         img_size=opt.img_size,
-        batch_size=8,
+        batch_size=batch_size,
     )
 
     print("Average Precisions:")

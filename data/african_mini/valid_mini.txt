@@ -1,0 +1,4 @@
+data\african_mini\images\valid\buffalo_003.jpg
+data\african_mini\images\valid\elephant_003.jpg
+data\african_mini\images\valid\rhino_003.jpg
+data\african_mini\images\valid\zebra_003.jpg

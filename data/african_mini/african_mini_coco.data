@@ -1,0 +1,6 @@
+classes= 80
+train=data/african_mini/train_mini.txt
+valid=data/african_mini/train_mini.txt
+names=data/coco.names
+backup=backup/
+eval=coco
