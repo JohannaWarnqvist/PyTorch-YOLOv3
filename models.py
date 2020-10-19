@@ -318,7 +318,6 @@ class Darknet(nn.Module):
                 break
             if module_def["type"] == "convolutional":
                 conv_layer = module[0]
-                print(module_def)
                 if conv_layer.bias is not None:
                     # Load conv. bias
                     num_b = conv_layer.bias.numel()
