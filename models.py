@@ -385,7 +385,7 @@ class Darknet(nn.Module):
         """Create changes in the model to adjust the model to a different dataset. 
         Args: num_classes is th number of classes in the new dataset."""
         
-        for i, block in zip(range(len(self.block_list[1:])), self.block_list[1:]):
+        for i, block in zip(range(len(self.module_defs [1:])), self.module_defs [1:]):
             if block["type"] == "yolo":        
                 #Change number of classes in YOLO layer
                 self.module_list[i][0].num_classes = num_classes
