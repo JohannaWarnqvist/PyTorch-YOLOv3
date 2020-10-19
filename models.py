@@ -54,12 +54,12 @@ def create_modules(block_list):
             
             # Add batch normalization
             if batch_normalization:
-                batch_norm = nn.BatchNorm2d(filters)
+                batch_norm = nn.BatchNorm2d(filters, momentum=0.9, eps=1e-5)
                 module.add_module("batch_norm_{}".format(index), batch_norm)
             
             # Add activation
             if activation == "leaky":
-                act = nn.LeakyReLU()
+                act = nn.LeakyReLU(0.1)
                 module.add_module("leaky_{}".format(index), act)
         
         elif block["type"] == "yolo":
