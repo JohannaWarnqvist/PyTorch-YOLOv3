@@ -43,6 +43,8 @@ if __name__ == "__main__":
     # Set up model
     model = Darknet(opt.model_def, img_size=opt.img_size).to(device)
 
+    #print(model)
+
     if opt.weights_path.endswith(".weights"):
         # Load darknet weights
         model.load_darknet_weights(opt.weights_path)
@@ -51,6 +53,7 @@ if __name__ == "__main__":
         model.load_state_dict(torch.load(opt.weights_path))
 
     model.custom_model(num_classes=4)
+    
     model.eval()  # Set in evaluation mode
 
     dataloader = DataLoader(
@@ -76,6 +79,7 @@ if __name__ == "__main__":
         # Get detections
         with torch.no_grad():
             detections = model(input_imgs)
+            print(detections.shape, "detection shape")
             detections = non_max_suppression(detections, opt.conf_thres, opt.nms_thres)
 
         # Log progress
