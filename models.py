@@ -130,7 +130,7 @@ class YOLOLayer(nn.Module):
     """Detection layer"""
 
 class YOLOLayer(nn.Module):
-    def __init__(self, mask, anchors, num_classes, num, jitter, ignore_thresh, truth_thresh, random, img_dim=416):
+    def __init__(self, mask, anchors, num_classes, num, jitter, ignore_thres, truth_thres, random, img_dim=416):
         super(YOLOLayer,self).__init__()
         self.mask = mask
         self.anchors= anchors
@@ -138,8 +138,8 @@ class YOLOLayer(nn.Module):
         self.num_classes = num_classes
         self.num = num
         self.jitter = jitter
-        self.ignore_thresh = ignore_thresh #0.5
-        self.truth_thresh = truth_thresh
+        self.ignore_thres = ignore_thres #0.5
+        self.truth_thres = truth_thres
         self.random = random
         self.mse_loss = nn.MSELoss()
         self.bce_loss = nn.BCELoss()
@@ -172,7 +172,6 @@ class YOLOLayer(nn.Module):
         num_samples = x.size(0)
         grid_size = x.size(2)
 
-        print(self.num_classes)
         prediction = (
             x.view(num_samples, self.num_anchors, self.num_classes + 5, grid_size, grid_size)
             .permute(0, 1, 3, 4, 2)
@@ -185,7 +184,7 @@ class YOLOLayer(nn.Module):
         w = prediction[..., 2]  # Width
         h = prediction[..., 3]  # Height
         pred_conf = torch.sigmoid(prediction[..., 4])  # Conf
-        pred_cls = torch.sigmoid(prediction[..., 5:])  # Cls pred.
+        pred_cls = torch.sigmoid(prediction[..., 5:])  # Cls pred
 
         # If grid size does not match current we compute new offsets
         if grid_size != self.grid_size:
@@ -280,13 +279,9 @@ class Darknet(nn.Module):
         img_dim = x.shape[2]
         loss = 0
         layer_outputs, yolo_outputs = [], []
-        #print("forward",len(self.module_defs), len(self.module_list))
         for i, (module_def, module) in enumerate(zip(self.module_defs, self.module_list)):
             if module_def["type"] in ["convolutional", "upsample", "maxpool"]:
-         #       print('out_channels', module[0].out_channels, 'input', x.shape, end='')
-          #      print(module)
                 x = module(x)
-           #     print( 'input->out', x.shape)
             elif module_def["type"] == "route":
                 # Concatenates the given layers along the depth dimension
                 x = torch.cat([layer_outputs[int(layer_i)] for layer_i in module_def["layers"].split(",")], 1)
@@ -295,7 +290,6 @@ class Darknet(nn.Module):
                 layer_i = int(module_def["from"])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
             elif module_def["type"] == "yolo":
-            #    print('YOLO!!!!!!!!', x.shape)
                 x, layer_loss = module[0](x, targets, img_dim)
                 loss += layer_loss
                 yolo_outputs.append(x)
