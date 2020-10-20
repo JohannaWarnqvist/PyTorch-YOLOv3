@@ -280,13 +280,13 @@ class Darknet(nn.Module):
         img_dim = x.shape[2]
         loss = 0
         layer_outputs, yolo_outputs = [], []
-        print("forward",len(self.module_defs), len(self.module_list))
+        #print("forward",len(self.module_defs), len(self.module_list))
         for i, (module_def, module) in enumerate(zip(self.module_defs, self.module_list)):
             if module_def["type"] in ["convolutional", "upsample", "maxpool"]:
-                print('out_channels', module[0].out_channels, 'input', x.shape, end='')
-                print(module)
+         #       print('out_channels', module[0].out_channels, 'input', x.shape, end='')
+          #      print(module)
                 x = module(x)
-                print( 'input->out', x.shape)
+           #     print( 'input->out', x.shape)
             elif module_def["type"] == "route":
                 # Concatenates the given layers along the depth dimension
                 x = torch.cat([layer_outputs[int(layer_i)] for layer_i in module_def["layers"].split(",")], 1)
@@ -295,7 +295,7 @@ class Darknet(nn.Module):
                 layer_i = int(module_def["from"])
                 x = layer_outputs[-1] + layer_outputs[layer_i]
             elif module_def["type"] == "yolo":
-                print('YOLO!!!!!!!!', x.shape)
+            #    print('YOLO!!!!!!!!', x.shape)
                 x, layer_loss = module[0](x, targets, img_dim)
                 loss += layer_loss
                 yolo_outputs.append(x)
@@ -388,37 +388,12 @@ class Darknet(nn.Module):
 
     def custom_model(self, num_classes):
         """Create changes in the model to adjust the model to a different dataset. 
+        This function is not used.
         Args: num_classes is th number of classes in the new dataset."""
 
         for block0, block1 in zip(self.module_list, self.module_list[1:]): 
-            if isinstance(block1[0], YOLOLayer):
-                print('BEFORE YOLO!', block1[0].num_classes, block0[0].out_channels)
-
+            if isinstance(block1[0], YOLOLayer):   
                 block1[0].num_classes = num_classes
                 block0[0].out_channels = 3*(5 + num_classes)
 
-                print('AFTER YOLO!', block1[0].num_classes, block0[0].out_channels)
-##########
-       # for block0, block1 in zip(self.module_defs, self.module_defs[1:]):
-           # if block1["type"] == "yolo":  
-            #if isinstance(block1[0], YOLOLayer):
-                #print('BEFORE YOLO!', block1['classes'], block0['filters'])
-
-                #block1['classes'] = num_classes
-               # block0['filters'] = 3*(5 + num_classes)
-
-                #print('AFTER YOLO!', block1['classes'], block0['filters'])
-
-
-                #print(self.module_list[80:])
-    
-                #Change number of classes in YOLO layer
-               # print('BEFORE: ', block1.classes, block0.out_channels)
-
-                #block1[0].classes = num_classes
-                #Change number of filters in conv layer previous of YOLO layer
-                #block0[0].out_channels = (num_classes + 5) * 3
-
-                #print('AFTER: ', block1.classes, block0.out_channels)
-                #print('After:' ,self.module_list[i][0].classes, self.module_list[i-1][0].out_channels )
-
+              
