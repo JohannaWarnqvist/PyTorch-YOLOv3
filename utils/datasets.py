@@ -7,7 +7,7 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 
-from utils.augmentations import horisontal_flip
+from utils.augmentations import horisontal_flip, random_cutout, color_jitter
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
@@ -126,13 +126,12 @@ class ListDataset(Dataset):
 
         # Apply augmentations
         if self.augment:
-            if np.random.random() < 0.3:
+            if np.random.random() < 0.5:
                 img, targets = horisontal_flip(img, targets)
-            if np.random.random() < 0.3:
+            if np.random.random() < 0.5:
                 img, targets = color_jitter(img, targets)
-            if np.random.random() < 0.2:
-                img, targets = vertical_flip(img, targets)
-
+            if np.random.random() < 0.5:
+                img, targets = random_cutout(img, targets)
 
         return img_path, img, targets
 
