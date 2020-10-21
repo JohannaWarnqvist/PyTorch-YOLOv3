@@ -367,16 +367,17 @@ class Darknet(nn.Module):
         for i, (module_def, module) in enumerate(zip(self.module_defs[:cutoff], self.module_list[:cutoff])):
             if module_def["type"] == "convolutional":
                 conv_layer = module[0]
+                # Load conv bias
+                if conv_layer.bias is not None:
+                    conv_layer.bias.data.cpu().numpy().tofile(fp)
                 # If batch norm, load bn first
-                if module_def["batch_normalize"]:
+                elif module_def["batch_normalize"]:
                     bn_layer = module[1]
                     bn_layer.bias.data.cpu().numpy().tofile(fp)
                     bn_layer.weight.data.cpu().numpy().tofile(fp)
                     bn_layer.running_mean.data.cpu().numpy().tofile(fp)
                     bn_layer.running_var.data.cpu().numpy().tofile(fp)
-                # Load conv bias
-                else:
-                    conv_layer.bias.data.cpu().numpy().tofile(fp)
+
                 # Load conv weights
                 conv_layer.weight.data.cpu().numpy().tofile(fp)
 
