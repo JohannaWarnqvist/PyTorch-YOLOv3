@@ -109,10 +109,11 @@ if __name__ == "__main__":
                 # Accumulates gradient before each step
                 optimizer.step()
                 optimizer.zero_grad()
-
-            # ----------------
-            #   Log progress
-            # ----------------
+            
+            
+        # ----------------
+        #   Log progress
+        # ----------------
 
             log_str = "\n---- [Epoch %d/%d, Batch %d/%d] ----\n" % (epoch, opt.epochs, batch_i, len(dataloader))
 
@@ -135,17 +136,18 @@ if __name__ == "__main__":
                 tensorboard_log += [("loss", loss.item())]
                 logger.list_of_scalars_summary(tensorboard_log, batches_done)
 
-            log_str += AsciiTable(metric_table).table
-            log_str += f"\nTotal loss {loss.item()}"
+                log_str += AsciiTable(metric_table).table
+                log_str += f"\nTotal loss {loss.item()}"
 
-            # Determine approximate time left for epoch
-            epoch_batches_left = len(dataloader) - (batch_i + 1)
-            time_left = datetime.timedelta(seconds=epoch_batches_left * (time.time() - start_time) / (batch_i + 1))
-            log_str += f"\n---- ETA {time_left}"
+                # Determine approximate time left for epoch
+                epoch_batches_left = len(dataloader) - (batch_i + 1)
+                time_left = datetime.timedelta(seconds=epoch_batches_left * (time.time() - start_time) / (batch_i + 1))
+                log_str += f"\n---- ETA {time_left}"
 
-            print(log_str)
+                print(log_str)
 
             model.seen += imgs.size(0)
+            
 
         if epoch % opt.evaluation_interval == 0:
             print("\n---- Evaluating Model ----")
@@ -165,6 +167,8 @@ if __name__ == "__main__":
                 ("val_mAP", AP.mean()),
                 ("val_f1", f1.mean()),
             ]
+            
+            
             logger.list_of_scalars_summary(evaluation_metrics, epoch)
 
             # Print class APs and mAP

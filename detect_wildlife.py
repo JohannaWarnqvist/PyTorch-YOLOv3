@@ -51,8 +51,6 @@ if __name__ == "__main__":
     else:
         # Load checkpoint weights
         model.load_state_dict(torch.load(opt.weights_path))
-
-    #model.custom_model(num_classes=4)
     
     model.eval()  # Set in evaluation mode
 
@@ -110,7 +108,6 @@ if __name__ == "__main__":
 
         # Draw bounding boxes and labels of detections
         if detections is not None:
-            #print('Detected! ',  len(unique_labels))
             # Rescale boxes to original image
             detections = rescale_boxes(detections, opt.img_size, img.shape[:2])
             unique_labels = detections[:, -1].cpu().unique()
@@ -118,8 +115,7 @@ if __name__ == "__main__":
             bbox_colors = random.sample(colors, n_cls_preds)
             for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
 
-                #print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
-                print("\t+ Label: %s, Conf: %.5f" % (int(cls_pred), cls_conf.item()))
+                print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
 
                 box_w = x2 - x1
                 box_h = y2 - y1
@@ -133,8 +129,7 @@ if __name__ == "__main__":
                 plt.text(
                     x1,
                     y1,
-                    #s=classes[int(cls_pred)],
-                    s = int(cls_pred),
+                    s=classes[int(cls_pred)],
                     color="white",
                     verticalalignment="top",
                     bbox={"color": color, "pad": 0},

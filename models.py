@@ -130,7 +130,7 @@ class YOLOLayer(nn.Module):
     """Detection layer"""
 
 class YOLOLayer(nn.Module):
-    def __init__(self, mask, anchors, num_classes, num, jitter, ignore_thres, truth_thres, random, img_dim=416):
+    def __init__(self, mask, anchors, num_classes, num, jitter, ignore_thresh, truth_thresh, random, img_dim=416):
         super(YOLOLayer,self).__init__()
         self.mask = mask
         self.anchors= anchors
@@ -138,8 +138,8 @@ class YOLOLayer(nn.Module):
         self.num_classes = num_classes
         self.num = num
         self.jitter = jitter
-        self.ignore_thres = ignore_thres #0.5
-        self.truth_thres = truth_thres
+        self.ignore_thresh = ignore_thresh #0.5
+        self.truth_thresh = truth_thresh
         self.random = random
         self.mse_loss = nn.MSELoss()
         self.bce_loss = nn.BCELoss()
@@ -184,7 +184,7 @@ class YOLOLayer(nn.Module):
         w = prediction[..., 2]  # Width
         h = prediction[..., 3]  # Height
         pred_conf = torch.sigmoid(prediction[..., 4])  # Conf
-        pred_cls = torch.sigmoid(prediction[..., 5:])  # Cls pred
+        pred_cls = torch.sigmoid(prediction[..., 5:])  # Cls pred.
 
         # If grid size does not match current we compute new offsets
         if grid_size != self.grid_size:
@@ -214,7 +214,7 @@ class YOLOLayer(nn.Module):
                 pred_cls=pred_cls,
                 target=targets,
                 anchors=self.scaled_anchors,
-                ignore_thres=self.ignore_thres,
+                ignore_thres=self.ignore_thresh,
             )
 
             # Loss : Mask outputs to ignore non-existing objects (except with conf. loss)
@@ -279,9 +279,11 @@ class Darknet(nn.Module):
         img_dim = x.shape[2]
         loss = 0
         layer_outputs, yolo_outputs = [], []
+    
         for i, (module_def, module) in enumerate(zip(self.module_defs, self.module_list)):
             if module_def["type"] in ["convolutional", "upsample", "maxpool"]:
                 x = module(x)
+
             elif module_def["type"] == "route":
                 # Concatenates the given layers along the depth dimension
                 x = torch.cat([layer_outputs[int(layer_i)] for layer_i in module_def["layers"].split(",")], 1)
