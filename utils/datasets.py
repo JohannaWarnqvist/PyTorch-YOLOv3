@@ -126,8 +126,11 @@ class ListDataset(Dataset):
 
         # Apply augmentations
         if self.augment:
-            if np.random.random() < 0.5:
+            if np.random.random() < 0.3:
                 img, targets = horisontal_flip(img, targets)
+            if np.random.random() < 0.3:
+                img, targets = color_jitter(img, targets)
+
 
         return img_path, img, targets
 
