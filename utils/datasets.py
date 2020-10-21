@@ -130,6 +130,8 @@ class ListDataset(Dataset):
                 img, targets = horisontal_flip(img, targets)
             if np.random.random() < 0.3:
                 img, targets = color_jitter(img, targets)
+            if np.random.random() < 0.2:
+                img, targets = vertical_flip(img, targets)
 
 
         return img_path, img, targets
