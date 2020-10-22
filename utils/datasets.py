@@ -132,6 +132,8 @@ class ListDataset(Dataset):
                 img, targets = color_jitter(img, targets)
             if np.random.random() < 0.5:
                 img, targets = random_cutout(img, targets)
+            if np.random.random() < 0.3:
+                img, targets = vertical_flip(img, targets)
 
         return img_path, img, targets
 
