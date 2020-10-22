@@ -1,6 +1,4 @@
-classes= 80
+classes=4
 train=data/african_mini/train_mini.txt
 valid=data/african_mini/valid_mini.txt
 names=data/wildlife.names
-backup=backup/
-eval=coco
