@@ -1,0 +1,5 @@
+classes= 4
+train=dataset/images/train_.txt
+valid=dataset/images/valid_.txt
+names=dataset/wildlife.names
+backup=backup/
