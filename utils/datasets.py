@@ -7,7 +7,7 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 
-from utils.augmentations import horisontal_flip, random_cutout, color_jitter
+from utils.augmentations import *
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
