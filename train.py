@@ -59,9 +59,11 @@ if __name__ == "__main__":
     augment = opt.augmentation
 
     # If specified we start from checkpoint
+    prev_epoch = -1
     if opt.pretrained_weights:
         if opt.pretrained_weights.endswith(".pth"):
             model.load_state_dict(torch.load(opt.pretrained_weights))
+            prev_epoch=opt.pretrained_weights.split("_")[-1].split(".")[0]
         else:
             model.load_darknet_weights(opt.pretrained_weights)
 
@@ -95,7 +97,7 @@ if __name__ == "__main__":
         "conf_noobj",
     ]
 
-    for epoch in range(opt.epochs):
+    for epoch in range(prev_epoch+1, opt.epochs):
         model.train()
         start_time = time.time()
         for batch_i, (_, imgs, targets) in enumerate(dataloader):
