@@ -36,6 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation_interval", type=int, default=1, help="interval evaluations on validation set")
     parser.add_argument("--compute_map", default=False, help="if True computes mAP every tenth batch")
     parser.add_argument("--multiscale_training", default=True, help="allow for multi-scale training")
+    parser.add_argument("--augmentation", default=False, help="allow use of augmentation")
     opt = parser.parse_args()
     print(opt)
 
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     # Initiate model
     model = Darknet(opt.model_def).to(device)
     model.apply(weights_init_normal)
+    augment = opt.augmentation
 
     # If specified we start from checkpoint
     if opt.pretrained_weights:
@@ -64,7 +66,7 @@ if __name__ == "__main__":
             model.load_darknet_weights(opt.pretrained_weights)
 
     # Get dataloader
-    dataset = ListDataset(train_path, augment=False, multiscale=opt.multiscale_training)
+    dataset = ListDataset(train_path, augment=augment, multiscale=opt.multiscale_training)
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,
