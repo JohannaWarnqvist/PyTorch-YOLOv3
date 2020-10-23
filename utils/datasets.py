@@ -7,7 +7,7 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 
-from utils.augmentations import horisontal_flip, random_cutout, color_jitter
+from utils.augmentations import *
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
@@ -62,7 +62,7 @@ class ListDataset(Dataset):
             self.img_files = file.readlines()
 
         self.label_files = [
-            path.replace("images", "labels").replace(".png", ".txt").replace(".jpg", ".txt")
+            path.replace("images", "labels").replace(".png", ".txt").replace(".jpg", ".txt").replace(".JPG", ".txt.")
             for path in self.img_files
         ]
         self.img_size = img_size
@@ -132,6 +132,8 @@ class ListDataset(Dataset):
                 img, targets = color_jitter(img, targets)
             if np.random.random() < 0.5:
                 img, targets = random_cutout(img, targets)
+            if np.random.random() < 0.3:
+                img, targets = vertical_flip(img, targets)
 
         return img_path, img, targets
 

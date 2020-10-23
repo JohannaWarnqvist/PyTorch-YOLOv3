@@ -23,7 +23,7 @@ from matplotlib.ticker import NullLocator
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_folder", type=str, default="data/samples", help="path to dataset")
+    parser.add_argument("--image_folder", type=str, default="data/detect_wildlife", help="path to dataset")
     parser.add_argument("--model_def", type=str, default="config/yolov3_wildlife.cfg", help="path to model definition file")
     parser.add_argument("--weights_path", type=str, default="weights/darknet53.conv.74", help="path to weights file")
     parser.add_argument("--class_path", type=str, default="data/wildlife.names", help="path to class label file")
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Set up model
     model = Darknet(opt.model_def, img_size=opt.img_size).to(device)
 
-    if opt.weights_path.endswith(".weights"):
+    if opt.weights_path.endswith(".weights") or opt.weights_path.endswith(".74") :
         # Load darknet weights
         model.load_darknet_weights(opt.weights_path)
     else:
