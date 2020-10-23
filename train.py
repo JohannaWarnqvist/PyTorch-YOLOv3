@@ -63,7 +63,7 @@ if __name__ == "__main__":
     if opt.pretrained_weights:
         if opt.pretrained_weights.endswith(".pth"):
             model.load_state_dict(torch.load(opt.pretrained_weights))
-            prev_epoch=opt.pretrained_weights.split("_")[-1].split(".")[0]
+            prev_epoch=int(opt.pretrained_weights.split("_")[-1].split(".")[0])
         else:
             model.load_darknet_weights(opt.pretrained_weights)
 
