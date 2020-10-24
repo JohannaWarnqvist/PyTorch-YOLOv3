@@ -137,6 +137,12 @@ if __name__ == "__main__":
                         if name != "grid_size":
                             tensorboard_log += [(f"{name}_{j+1}", metric)]
                 tensorboard_log += [("loss", loss.item())]
+
+                with open("log_files/loss.txt", "a+") as f:
+                    for listitem in tensorboard_log:
+                        f.write(str(listitem))
+                    f.write("\n\n")
+
                 logger.list_of_scalars_summary(tensorboard_log, batches_done)
 
             log_str += AsciiTable(metric_table).table
@@ -148,6 +154,13 @@ if __name__ == "__main__":
             log_str += f"\n---- ETA {time_left}"
 
             print(log_str)
+
+            # Write to file
+            f = open("log_files/training.txt", "a+")
+            f.write(f"Epoch: {epoch}")
+            f.write(log_str)
+            f.write("\n")
+            f.close()
 
             model.seen += imgs.size(0)
 
@@ -171,6 +184,15 @@ if __name__ == "__main__":
                 ("val_mAP", AP.mean()),
                 ("val_f1", f1.mean()),
             ]
+
+            # Write to file
+            f = open("log_files/validation.txt", "a+")
+            f.write(f"Epoch: {epoch}")
+            f.write(evaluation_metrics)
+            f.write("\n")
+            f.close()
+
+
             logger.list_of_scalars_summary(evaluation_metrics, epoch)
 
             # Print class APs and mAP
@@ -179,6 +201,13 @@ if __name__ == "__main__":
                 ap_table += [[c, class_names[c], "%.5f" % AP[i]]]
             print(AsciiTable(ap_table).table)
             print(f"---- mAP {AP.mean()}")
+
+            f = open("log_files/mAP.txt", "a+")
+            f.write(f"Epoch: {epoch}")
+            f.write(AsciiTable(ap_table).table)
+            f.write(f"---- mAP {AP.mean()}")
+            f.close()
+
 
         if epoch % opt.checkpoint_interval == 0:
             torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % epoch)
