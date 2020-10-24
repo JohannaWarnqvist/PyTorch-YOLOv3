@@ -185,13 +185,12 @@ if __name__ == "__main__":
                 ("val_f1", f1.mean()),
             ]
 
-            # Write to file
-            f = open("log_files/validation.txt", "a+")
-            f.write(f"Epoch: {epoch}")
-            f.write(evaluation_metrics)
-            f.write("\n")
-            f.close()
 
+            with open("log_files/validation.txt", "a+") as f:
+                for name, val in evaluation_metrics:
+                    f.write(str(name))
+                    f.write(str(val))
+                f.write("\n\n")
 
             logger.list_of_scalars_summary(evaluation_metrics, epoch)
 
