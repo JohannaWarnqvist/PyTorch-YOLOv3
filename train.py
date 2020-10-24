@@ -157,7 +157,6 @@ if __name__ == "__main__":
 
             # Write to file
             f = open("log_files/training.txt", "a+")
-            f.write(f"Epoch: {epoch}")
             f.write(log_str)
             f.write("\n")
             f.close()
@@ -189,7 +188,9 @@ if __name__ == "__main__":
             with open("log_files/validation.txt", "a+") as f:
                 for name, val in evaluation_metrics:
                     f.write(str(name))
+                    f.write(": ")
                     f.write(str(val))
+                    f.write("\n")
                 f.write("\n\n")
 
             logger.list_of_scalars_summary(evaluation_metrics, epoch)
@@ -202,9 +203,10 @@ if __name__ == "__main__":
             print(f"---- mAP {AP.mean()}")
 
             f = open("log_files/mAP.txt", "a+")
-            f.write(f"Epoch: {epoch}")
+            f.write(f"Epoch: {epoch}\n")
             f.write(AsciiTable(ap_table).table)
-            f.write(f"---- mAP {AP.mean()}")
+            f.write("\n")
+            f.write(f"---- mAP {AP.mean()}\n\n")
             f.close()
 
 
