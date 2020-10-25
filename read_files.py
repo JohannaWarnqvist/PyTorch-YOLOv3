@@ -70,48 +70,48 @@ def read_validation_data(file):
 
 
 def read_loss(filenames, doublet_epoch=None, doublet_batch=0):
-	"""Read loss file. Delete doublets if program breaked after epoch doublet_epoch 
-	and batch doublet_batch, and restart at start of same epoch. Epoch and batch 
-	counted from 1."""
+    """Read loss file. Delete doublets if program breaked after epoch doublet_epoch 
+    and batch doublet_batch, and restart at start of same epoch. Epoch and batch 
+    counted from 1."""
 
-	batches = 0
-	rows = 0
-	dict_batches = []
+    batches = 0
+    rows = 0
+    dict_batches = []
 
-	if doublet_epoch is not None:
-		doublet_start = (doublet_epoch-1)*150+1
-		doublet_end = (doublet_epoch-1)*150+doublet_batch
+    if doublet_epoch is not None:
+        doublet_start = (doublet_epoch-1)*150+1
+        doublet_end = (doublet_epoch-1)*150+doublet_batch
 
-	
-	for filename in filenames:
-		f = open(filename, 'r')
+    
+    for filename in filenames:
+        f = open(filename, 'r')
 
-		for line in f:
-			if line.strip():
-				rows = rows + 1
+        for line in f:
+            if line.strip():
+                rows = rows + 1
 
-				# Check only once per batch
-				if rows % 14 == 0:
-					batches = batches + 1
+                # Check only once per batch
+                if rows % 14 == 0:
+                    batches = batches + 1
 
-					if doublet_epoch is not None and batches >= doublet_start and batches <= doublet_end:
-						continue
+                    if doublet_epoch is not None and batches >= doublet_start and batches <= doublet_end:
+                        continue
 
-					else:
-						line_list = line.split(")(\'")
-						line_list = [a for lines in line_list for a in lines.split("', ")]
-						line_list[0] = line_list[0].strip("('")
-						line_list[-1] = line_list[-1].strip("\n")
-						line_list[-1] = line_list[-1].strip(")")
+                    else:
+                        line_list = line.split(")(\'")
+                        line_list = [a for lines in line_list for a in lines.split("', ")]
+                        line_list[0] = line_list[0].strip("('")
+                        line_list[-1] = line_list[-1].strip("\n")
+                        line_list[-1] = line_list[-1].strip(")")
 
-						dict_batch = {}
-						for n in range(0, len(line_list), 2):
-							dict_batch[line_list[n]] = float(line_list[n+1])
+                        dict_batch = {}
+                        for n in range(0, len(line_list), 2):
+                            dict_batch[line_list[n]] = float(line_list[n+1])
 
-						dict_batches.append(dict_batch)
+                        dict_batches.append(dict_batch)
 
-	batches = batches - doublet_batch
-	return dict_batches, batches
+    batches = batches - doublet_batch
+    return dict_batches, batches
 
 def plot_map(data, classes, augmentation):
     """ Plot mAP for every epoch.
@@ -123,7 +123,6 @@ def plot_map(data, classes, augmentation):
     fig, ax = plt.subplots() 
     epochs = np.arange(1, len(data[0])+1)
     for i in range(len(data)-1):
-        print(data[i])
         plt.plot(epochs, data[i], label=classes[i])
     plt.plot(epochs, data[-1], label='mAP', c='black', linestyle='dashed')
     
@@ -136,51 +135,50 @@ def plot_map(data, classes, augmentation):
     plt.legend()
     
     
-def plot_training_metric(dict_batches, metric, nr_batches, augmentation):
-	"""Plot a metric for each batch in each epoch.
-	   dict_batches is the dict with all data.
-	   metric is the name of the metric.
-	   nr_batches is the total number of batches over time.
-	   augmentation indicates if augmentation was used during training.
-	"""
+def plot_training_metric(dict_batches, metric, nr_batches, augmentation, all_batches = True):
+    """Plot a metric for each batch in each epoch.
+       dict_batches is the dict with all data.
+       metric is the name of the metric.
+       nr_batches is the total number of batches over time.
+       augmentation indicates if augmentation was used during training.
+    """
 
-	plt.plot(range(nr_batches), [dict_batches[i][metric] for i in range(nr_batches)])
-	plt.xlabel("batches")
-	plt.ylabel(metric)
-	if augmentation:
-		plt.title(f"{metric} when training with augmented data")
-	else:
-		plt.title(f"{metric} when training without augmented data")
+    if all_batches:
+        plt.plot(range(nr_batches), [dict_batches[i][metric] for i in range(nr_batches)])
+        plt.xlabel("Batch")
+        plt.ylabel(metric)
+    else:
+        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([dict_batches[i][metric] for i in range(j*150, 150*j+150)]) for j in range(int(nr_batches/150))])
+        plt.xlabel("Epoch")
+        plt.ylabel(f"Average {metric} per batch")
+    
+    if augmentation:
+        plt.title(f"{metric} when training with augmented data")
+    else:
+        plt.title(f"{metric} when training without augmented data")
 
-def plot_average(dict_batches, metric, nr_batches, augmentation):
-	"""Plot average of a metric over different YOLO-layers for each batch in each epoch.
-	   dict_batches is the dict with all data.
-	   metric is the name of the metric.
-	   nr_batches is the total number of batches over time.
-	   augmentation indicates if augmentation was used during training.
-	"""
+def plot_average(dict_batches, metric, nr_batches, augmentation, all_batches = True):
+    """Plot average of a metric over different YOLO-layers for each batch in each epoch.
+       dict_batches is the dict with all data.
+       metric is the name of the metric.
+       nr_batches is the total number of batches over time.
+       augmentation indicates if augmentation was used during training.
+    """
 
-	plt.plot(range(nr_batches), [sum([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)])/3 for i in range(nr_batches)])
-	plt.xlabel("batches")
-	plt.ylabel(metric)
-	if augmentation:
-		plt.title(f"Average {metric} when training with augmented data")
-	else:
-		plt.title(f"Average {metric} when training without augmented data")
+    if all_batches:
+        plt.plot(range(nr_batches), [sum([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)])/3 for i in range(nr_batches)])
+        plt.xlabel("Batch")
+        plt.ylabel(metric)
+    else:
+        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(k*150, 150*k+150)]) for k in range(int(nr_batches/150))])
+        #plt.plot(range(1,int(nr_batches/150)+1),         [np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(149, nr_batches+1, 150)])
+        plt.xlabel("Epoch")
+        plt.ylabel(f"Average {metric} per batch")
+    if augmentation:
+        plt.title(f"Average {metric} when training with augmented data")
+    else:
+        plt.title(f"Average {metric} when training without augmented data")
 
-
-dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
-									  "log_files/loss_small_without_2.txt",
-									  "log_files/loss_small_without_3.txt"
-									 ], 34, 115)
-
-plt.figure(0)
-plot_training_metric(dict_batches, 'loss', nr_batches, False)
-
-plt.figure(1)
-plot_average(dict_batches, 'precision', nr_batches, False)
-
-plt.show()
 
 def plot_val_metrics(data, metric, augmentation):
     """ Plot validation metrics for every epoch.
@@ -200,3 +198,17 @@ def plot_val_metrics(data, metric, augmentation):
         ax.set_title(f"{metric} when training without augmented data")
 
 
+dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
+                                      "log_files/loss_small_without_2.txt",
+                                      "log_files/loss_small_without_3.txt"
+                                     ], 34, 115)
+
+plt.figure(0)
+plot_training_metric(dict_batches, 'loss', nr_batches, False, all_batches=False)
+
+plt.figure(1)
+plot_average(dict_batches, 'precision', nr_batches, False, True)
+plt.figure(2)
+plot_average(dict_batches, 'precision', nr_batches, False, False)
+
+plt.show()
