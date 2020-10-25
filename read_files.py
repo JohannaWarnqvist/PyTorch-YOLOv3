@@ -133,6 +133,7 @@ def plot_map(data, classes, augmentation):
     elif augmentation == False:
         ax.set_title("Average precision for each class \n when training without augmented data")
     plt.legend()
+    plt.savefig(f'plots/mAP_aug_{augmentation}.png')
     
     
 def plot_training_metric(dict_batches, metric, nr_batches, augmentation, all_batches = True):
@@ -171,7 +172,6 @@ def plot_average(dict_batches, metric, nr_batches, augmentation, all_batches = T
         plt.ylabel(metric)
     else:
         plt.plot(range(1,int(nr_batches/150)+1), [np.mean([np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(k*150, 150*k+150)]) for k in range(int(nr_batches/150))])
-        #plt.plot(range(1,int(nr_batches/150)+1),         [np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(149, nr_batches+1, 150)])
         plt.xlabel("Epoch")
         plt.ylabel(f"Average {metric} per batch")
     if augmentation:
@@ -197,6 +197,22 @@ def plot_val_metrics(data, metric, augmentation):
     elif augmentation == False:
         ax.set_title(f"{metric} when training without augmented data")
 
+    plt.savefig(f'plots/val_{metric}_aug_{augmentation}.png')
+
+
+
+dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
+									  "log_files/loss_small_without_2.txt",
+									  "log_files/loss_small_without_3.txt"
+									 ], 34, 115)
+
+plt.figure(0)
+plot_training_metric(dict_batches, 'loss', nr_batches, False)
+
+plt.figure(1)
+plot_average(dict_batches, 'precision', nr_batches, False)
+
+plt.show()
 
 dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
                                       "log_files/loss_small_without_2.txt",
