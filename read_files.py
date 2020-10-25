@@ -1,4 +1,33 @@
 import matplotlib.pyplot as plt
+import numpy as np
+
+def read_validation_data(file):
+    
+    val_precision = []
+    val_recall = []
+    val_mAP = []
+    val_f1 = []
+    
+
+    f = open(file, "r")
+    lines = f.read().split('\n') 
+    lines = [x for x in lines if x !='']
+    lines  = [x.split(': ') for x in lines] 
+
+
+    for line in lines:
+        if line[0] == "val_precision":
+            val_precision.append(float(line[1]))
+        elif line[0] == "val_recall":
+            val_recall.append(float(line[1]))
+        elif line[0] == "val_mAP":
+            val_mAP.append(float(line[1]))
+        elif line[0] == "val_f1":
+            val_f1.append(float(line[1]))
+
+    return val_precision, val_recall, val_mAP, val_f1
+
+
 
 def read_loss(filenames, doublet_epoch=None, doublet_batch=0):
 	"""Read loss file. Delete doublets if program breaked after epoch doublet_epoch 
@@ -66,3 +95,22 @@ plt.figure(1)
 plot_average(dict_batches, 'precision', nr_batches)
 
 plt.show()
+
+def plot_val_metrics(data, metric, augmentation):
+    """ Plot validation metrics for every epoch.
+    Args: data is the data to be plotted
+          metric is a string describing the plotted metric
+          augmentation is a boolean indicating if the training was done
+                  with or without augmentation """
+
+    fig,ax = plt.subplots()
+    epochs = np.arange(1, len(data)+1)
+    plt.plot(epochs, data)
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel(f'{metric}')
+    if augmentation == True:
+        ax.set_title(f"{metric} when training with augmented data")
+    elif augmentation == False:
+        ax.set_title(f"{metric} when training without augmented data")
+
+
