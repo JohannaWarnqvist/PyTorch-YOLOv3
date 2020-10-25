@@ -200,31 +200,4 @@ def plot_val_metrics(data, metric, augmentation):
     plt.savefig(f'plots/val_{metric}_aug_{augmentation}.png')
 
 
-
-dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
-									  "log_files/loss_small_without_2.txt",
-									  "log_files/loss_small_without_3.txt"
-									 ], 34, 115)
-
-plt.figure(0)
-plot_training_metric(dict_batches, 'loss', nr_batches, False)
-
-plt.figure(1)
-plot_average(dict_batches, 'precision', nr_batches, False)
-
-plt.show()
-
-dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
-                                      "log_files/loss_small_without_2.txt",
-                                      "log_files/loss_small_without_3.txt"
-                                     ], 34, 115)
-
-plt.figure(0)
-plot_training_metric(dict_batches, 'loss', nr_batches, False, all_batches=False)
-
-plt.figure(1)
-plot_average(dict_batches, 'precision', nr_batches, False, True)
-plt.figure(2)
-plot_average(dict_batches, 'precision', nr_batches, False, False)
-
 plt.show()
