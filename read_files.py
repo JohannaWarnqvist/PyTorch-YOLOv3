@@ -158,6 +158,8 @@ def plot_training_metric(dict_batches, metric, nr_batches, augmentation, all_bat
     else:
         plt.title(f"{metric} when training without augmented data")
 
+    plt.savefig(f'plots/train_{metric}_aug_{augmentation}.png')
+
 def plot_average(dict_batches, metric, nr_batches, augmentation, all_batches = True):
     """Plot average of a metric over different YOLO-layers for each batch in each epoch.
        dict_batches is the dict with all data.
@@ -174,10 +176,13 @@ def plot_average(dict_batches, metric, nr_batches, augmentation, all_batches = T
         plt.plot(range(1,int(nr_batches/150)+1), [np.mean([np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(k*150, 150*k+150)]) for k in range(int(nr_batches/150))])
         plt.xlabel("Epoch")
         plt.ylabel(f"Average {metric} per batch")
+
     if augmentation:
         plt.title(f"Average {metric} when training with augmented data")
     else:
         plt.title(f"Average {metric} when training without augmented data")
+
+    plt.savefig(f'plots/train_{metric}_aug_{augmentation}.png')
 
 
 def plot_val_metrics(data, metric, augmentation):
@@ -200,4 +205,3 @@ def plot_val_metrics(data, metric, augmentation):
     plt.savefig(f'plots/val_{metric}_aug_{augmentation}.png')
 
 
-plt.show()
