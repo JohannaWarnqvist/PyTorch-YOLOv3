@@ -136,7 +136,7 @@ def plot_map(data, classes, augmentation):
     plt.savefig(f'plots/mAP_aug_{augmentation}.png')
     
     
-def plot_training_metric(dict_batches, metric, nr_batches, augmentation, all_batches = True):
+def plot_training_metric(dict_batches, dict_batches_aug, metric, nr_batches,  all_batches = True):
     """Plot a metric for each batch in each epoch.
        dict_batches is the dict with all data.
        metric is the name of the metric.
@@ -145,22 +145,23 @@ def plot_training_metric(dict_batches, metric, nr_batches, augmentation, all_bat
     """
 
     if all_batches:
-        plt.plot(range(nr_batches), [dict_batches[i][metric] for i in range(nr_batches)])
+        plt.plot(range(nr_batches), [dict_batches[i][metric] for i in range(nr_batches)], label='No augmentation')
+        plt.plot(range(nr_batches), [dict_batches_aug[i][metric] for i in range(nr_batches)], label='Using augmentation')
         plt.xlabel("Batch")
         plt.ylabel(metric)
     else:
-        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([dict_batches[i][metric] for i in range(j*150, 150*j+150)]) for j in range(int(nr_batches/150))])
+        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([dict_batches[i][metric] for i in range(j*150, 150*j+150)]) for j in range(int(nr_batches/150))], label='No augmentation')
+        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([dict_batches_aug[i][metric] for i in range(j*150, 150*j+150)]) for j in range(int(nr_batches/150))], label='Using augmentation')
         plt.xlabel("Epoch")
         plt.ylabel(f"Average {metric} per batch")
     
-    if augmentation:
-        plt.title(f"{metric} when training with augmented data")
-    else:
-        plt.title(f"{metric} when training without augmented data")
+    
+    plt.title(f"{metric} for training ")
+    plt.legend()
 
-    plt.savefig(f'plots/train_{metric}_aug_{augmentation}.png')
+    plt.savefig(f'plots/train_{metric}_.png')
 
-def plot_average(dict_batches, metric, nr_batches, augmentation, all_batches = True):
+def plot_average(dict_batches, dict_batches_aug, metric, nr_batches, all_batches = True):
     """Plot average of a metric over different YOLO-layers for each batch in each epoch.
        dict_batches is the dict with all data.
        metric is the name of the metric.
@@ -169,23 +170,22 @@ def plot_average(dict_batches, metric, nr_batches, augmentation, all_batches = T
     """
 
     if all_batches:
-        plt.plot(range(nr_batches), [sum([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)])/3 for i in range(nr_batches)])
+        plt.plot(range(nr_batches), [sum([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)])/3 for i in range(nr_batches)], label='No augmentation')
+        plt.plot(range(nr_batches), [sum([dict_batches_aug[i]["" + metric + "_" + str(j)] for j in range(1,4)])/3 for i in range(nr_batches)], label='Using augmentation')
         plt.xlabel("Batch")
         plt.ylabel(metric)
     else:
-        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(k*150, 150*k+150)]) for k in range(int(nr_batches/150))])
+        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([np.mean([dict_batches[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(k*150, 150*k+150)]) for k in range(int(nr_batches/150))], label='No augmentation')
+        plt.plot(range(1,int(nr_batches/150)+1), [np.mean([np.mean([dict_batches_aug[i]["" + metric + "_" + str(j)] for j in range(1,4)]) for i in range(k*150, 150*k+150)]) for k in range(int(nr_batches/150))], label='Using augmentation')
         plt.xlabel("Epoch")
-        plt.ylabel(f"Average {metric} per batch")
+        plt.ylabel(f"Average {metric}")
 
-    if augmentation:
-        plt.title(f"Average {metric} when training with augmented data")
-    else:
-        plt.title(f"Average {metric} when training without augmented data")
-
-    plt.savefig(f'plots/train_{metric}_aug_{augmentation}.png')
+    plt.legend()
+    plt.title(f"Average {metric} when training")
+    plt.savefig(f'plots/train_{metric}_.png')
 
 
-def plot_val_metrics(data, metric, augmentation):
+def plot_val_metrics(data, data_aug, metric):
     """ Plot validation metrics for every epoch.
     Args: data is the data to be plotted
           metric is a string describing the plotted metric
@@ -194,15 +194,17 @@ def plot_val_metrics(data, metric, augmentation):
 
     fig,ax = plt.subplots()
     epochs = np.arange(1, len(data)+1)
-    plt.plot(epochs, data)
+    plt.plot(epochs, data, label='not using data augmentation')
+    plt.plot(epochs, data_aug, label='using data augmentation')
     ax.set_xlabel('Epoch')
     ax.set_ylabel(f'{metric}')
-    if augmentation == True:
-        ax.set_title(f"{metric} when training with augmented data")
-    elif augmentation == False:
-        ax.set_title(f"{metric} when training without augmented data")
+    #if augmentation == True:
+     #   ax.set_title(f"{metric} when training with augmented data")
+   # elif augmentation == False:
+    ax.set_title(f"{metric} for validation")
+    plt.legend()
 
-    plt.savefig(f'plots/val_{metric}_aug_{augmentation}.png')
+    plt.savefig(f'plots/val_{metric}.png')
 
 
 """
