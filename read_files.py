@@ -1,4 +1,32 @@
-import matplotlib.pyplot as plt
+iport matplotlib.pyplot as plt
+
+def read_validation_data(file):
+    
+    val_precision = []
+    val_recall = []
+    val_mAP = []
+    val_f1 = []
+    
+
+    f = open(file, "r")
+    lines = f.read().split('\n') 
+    lines = [x for x in lines if x !='']
+    lines  = [x.split(': ') for x in lines] 
+
+
+    for line in lines:
+        if line[0] == "val_precision":
+            val_precision.append(line[1])
+        elif line[0] == "val_recall":
+            val_recall.append(line[1])
+        elif line[0] == "val_mAP":
+            val_mAP.append(line[1])
+        elif line[0] == "val_f1":
+            val_f1.append(line[1])
+
+    return val_precision, val_recall, val_mAP, val_f1
+
+
 
 def read_loss(filenames):
 
