@@ -1,6 +1,46 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def read_map_data(file):
+    
+    file = open(file, "r")
+    lines = file.read().split('\n') 
+    classes = ['buffalo', 'elephant', 'rhino', 'zebra']
+
+    buffalo_ap = []
+    elephant_ap = []
+    rhino_ap = []
+    zebra_ap = []
+    mAP = []
+
+    for line in lines:
+        if 'buffalo' in line:
+            line = line.split("|")
+            line = [x for x in line if x != '']
+            buffalo_ap.append(float(line[2]))
+
+        if 'elephant' in line:
+            line = line.split("|")
+            line = [x for x in line if x != '']
+            elephant_ap.append(float(line[2]))
+
+        if 'rhino' in line:
+            line = line.split("|")
+            line = [x for x in line if x != '']
+            rhino_ap.append(float(line[2]))
+
+        if 'zebra' in line:
+            line = line.split("|")
+            line = [x for x in line if x != '']
+            zebra_ap.append(float(line[2]))
+            
+        if 'mAP' in line:
+            line = line.split("mAP")
+
+            mAP.append(float(line[1]))
+            
+    return  (buffalo_ap, elephant_ap, rhino_ap, zebra_ap, mAP), classes
+
 def read_validation_data(file):
     
     val_precision = []
@@ -73,6 +113,29 @@ def read_loss(filenames, doublet_epoch=None, doublet_batch=0):
 	batches = batches - doublet_batch
 	return dict_batches, batches
 
+def plot_map(data, classes, augmentation):
+    """ Plot mAP for every epoch.
+    Args: data is the data to be plotted (iterable with iterables)
+          classes is a iterable describing the classes
+          augmentation is a boolean indicating if the training was done 
+                  with or without augmentation """
+    
+    fig, ax = plt.subplots() 
+    epochs = np.arange(1, len(data[0])+1)
+    for i in range(len(data)-1):
+        print(data[i])
+        plt.plot(epochs, data[i], label=classes[i])
+    plt.plot(epochs, data[-1], label='mAP', c='black', linestyle='dashed')
+    
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Average precision')
+    if augmentation == True:
+        ax.set_title("Average precision for each class \n when training with augmented data")
+    elif augmentation == False:
+        ax.set_title("Average precision for each class \n when training without augmented data")
+    plt.legend()
+    
+    
 def plot_training_metric(dict_batches, metric, nr_batches, augmentation):
 	"""Plot a metric for each batch in each epoch.
 	   dict_batches is the dict with all data.
