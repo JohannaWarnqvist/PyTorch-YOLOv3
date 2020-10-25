@@ -36,6 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--evaluation_interval", type=int, default=1, help="interval evaluations on validation set")
     parser.add_argument("--compute_map", default=False, help="if True computes mAP every tenth batch")
     parser.add_argument("--multiscale_training", default=True, help="allow for multi-scale training")
+    parser.add_argument("--augmentation", default=False, help="allow use of augmentation")
     opt = parser.parse_args()
     print(opt)
 
@@ -55,16 +56,19 @@ if __name__ == "__main__":
     # Initiate model
     model = Darknet(opt.model_def).to(device)
     model.apply(weights_init_normal)
+    augment = opt.augmentation
 
     # If specified we start from checkpoint
+    prev_epoch = -1
     if opt.pretrained_weights:
         if opt.pretrained_weights.endswith(".pth"):
             model.load_state_dict(torch.load(opt.pretrained_weights))
+            prev_epoch=int(opt.pretrained_weights.split("_")[-1].split(".")[0])
         else:
             model.load_darknet_weights(opt.pretrained_weights)
 
     # Get dataloader
-    dataset = ListDataset(train_path, augment=True, multiscale=opt.multiscale_training)
+    dataset = ListDataset(train_path, augment=augment, multiscale=opt.multiscale_training)
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,
@@ -93,7 +97,7 @@ if __name__ == "__main__":
         "conf_noobj",
     ]
 
-    for epoch in range(opt.epochs):
+    for epoch in range(prev_epoch+1, opt.epochs):
         model.train()
         start_time = time.time()
         for batch_i, (_, imgs, targets) in enumerate(dataloader):
@@ -133,6 +137,12 @@ if __name__ == "__main__":
                         if name != "grid_size":
                             tensorboard_log += [(f"{name}_{j+1}", metric)]
                 tensorboard_log += [("loss", loss.item())]
+
+                with open("log_files/loss.txt", "a+") as f:
+                    for listitem in tensorboard_log:
+                        f.write(str(listitem))
+                    f.write("\n\n")
+
                 logger.list_of_scalars_summary(tensorboard_log, batches_done)
 
             log_str += AsciiTable(metric_table).table
@@ -144,6 +154,12 @@ if __name__ == "__main__":
             log_str += f"\n---- ETA {time_left}"
 
             print(log_str)
+
+            # Write to file
+            f = open("log_files/training.txt", "a+")
+            f.write(log_str)
+            f.write("\n")
+            f.close()
 
             model.seen += imgs.size(0)
 
@@ -167,6 +183,16 @@ if __name__ == "__main__":
                 ("val_mAP", AP.mean()),
                 ("val_f1", f1.mean()),
             ]
+
+
+            with open("log_files/validation.txt", "a+") as f:
+                for name, val in evaluation_metrics:
+                    f.write(str(name))
+                    f.write(": ")
+                    f.write(str(val))
+                    f.write("\n")
+                f.write("\n\n")
+
             logger.list_of_scalars_summary(evaluation_metrics, epoch)
 
             # Print class APs and mAP
@@ -175,6 +201,14 @@ if __name__ == "__main__":
                 ap_table += [[c, class_names[c], "%.5f" % AP[i]]]
             print(AsciiTable(ap_table).table)
             print(f"---- mAP {AP.mean()}")
+
+            f = open("log_files/mAP.txt", "a+")
+            f.write(f"Epoch: {epoch}\n")
+            f.write(AsciiTable(ap_table).table)
+            f.write("\n")
+            f.write(f"---- mAP {AP.mean()}\n\n")
+            f.close()
+
 
         if epoch % opt.checkpoint_interval == 0:
             torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % epoch)
