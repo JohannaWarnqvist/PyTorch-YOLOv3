@@ -35,7 +35,10 @@ def plot_average(dict_batches, name, nr_batches):
 
 	plt.plot(range(nr_batches), [sum([dict_batches[i]["" + name + "_" + str(j)] for j in range(1,4)])/3 for i in range(nr_batches)])
 
-dict_batches, nr_batches = read_loss(["loss_small_without_100000.txt"])
+dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
+									  "log_files/loss_small_without_2.txt",
+									  "log_files/loss_small_without_3.txt"
+									 ])
 
 plt.figure(0)
 plot_things(dict_batches, 'loss', nr_batches)
