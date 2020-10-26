@@ -380,14 +380,5 @@ class Darknet(nn.Module):
 
         fp.close()
 
-    def custom_model(self, num_classes):
-        """Create changes in the model to adjust the model to a different dataset. 
-        This function is not used.
-        Args: num_classes is th number of classes in the new dataset."""
-
-        for block0, block1 in zip(self.module_list, self.module_list[1:]): 
-            if isinstance(block1[0], YOLOLayer):   
-                block1[0].num_classes = num_classes
-                block0[0].out_channels = 3*(5 + num_classes)
 
               
