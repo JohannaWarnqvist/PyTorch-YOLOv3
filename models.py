@@ -6,7 +6,6 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 
-#from utils.parse_config import *
 from utils.parse_cfg_file import *
 from utils.utils import build_targets, to_cpu, non_max_suppression
 
@@ -15,10 +14,9 @@ import matplotlib.patches as patches
 
 
 def create_modules(block_list):
-    # Go through the different blocks
-    # Add a layer for each block in a list
+    "Go through the different blocks and add a layer for each block in a list"
     
-    # Get the net-"layer" somehow
+    # Get the info in the net-"layer"
     net_info = block_list.pop(0)
     
     module_list = nn.ModuleList()
@@ -63,7 +61,6 @@ def create_modules(block_list):
                 module.add_module("leaky_{}".format(index), act)
         
         elif block["type"] == "yolo":
-            #TODO
             
             mask = [int(x) for x in block["mask"].split(",")]
             
