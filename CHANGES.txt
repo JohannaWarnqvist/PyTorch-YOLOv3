@@ -1,0 +1,32 @@
+Changed files:
+
+utils/augmentation.py: Added augmentation functions for vertical_flip, color_jitter and random_cutout.
+
+utils/datasets.py: Added calls to new augmentation functions in ListDataset.__getitem__. Also added .JPG as a possible type for images.
+
+utils/logger.py: Rewritten to use torch.utils.tensorboard.SummaryWriter instead of tensorflow.summary.FileWriter.
+
+utils/utils.py: Changed ByteTensor to BoolTensor
+
+detect.py: Updated default arguments to be for our dataset, and added a split for \ when parsing filename.
+
+models.py: create_modules is partly rewritten to work with out parse_cfg_file-function. YOLO-layer is initialized with more values from the cfg-file. The darknet model is also adjusted a bit to work with parse_cfg_file.
+
+test.py: Generalised for other number of classes and batch sizes.
+
+train.py: Adapted to our model by changing default arguments and adding augmentation as a choice. If restarting from checkpoints it continues counting from there. Results are now written to files.
+
+
+New files:
+
+utils/parse_cfg_file.py: New file with a function parse_cfg_file that replaces parse_model_config in parse_config.py. Inspired by the function in parse_config but also another implementation done by Ayoosh Kathuria (https://github.com/ayooshkathuria/YOLO_v3_tutorial_from_scratch).
+
+change_file.py: Added path in front of filenames after using bash command to create txt-file with a list of all files in a folder.
+
+plot_result.py: Used to parse and plot all results with the help of the functions in read_files.
+
+read_files.py: Functions to parse data from the datafiles and create plots from the data.
+
+
+
+
