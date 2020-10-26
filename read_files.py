@@ -215,17 +215,3 @@ def plot_val_metrics(data, data_aug, metric):
     print(f"{metric} at best mAP epoch:{data_aug[56]} (aug)")
     print(f"{metric} at best mAP epoch:{data[57]} (NO aug) ")
 
-"""
-dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 
-									  "log_files/loss_small_without_2.txt",
-									  "log_files/loss_small_without_3.txt"
-									 ], 34, 115)
-
-plt.figure(0)
-plot_training_metric(dict_batches, 'loss', nr_batches, False)
-
-plt.figure(1)
-plot_average(dict_batches, 'precision', nr_batches, False)
-
-plt.show()
-"""
