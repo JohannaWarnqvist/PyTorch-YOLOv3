@@ -132,6 +132,7 @@ def plot_map(data, classes, augmentation):
         ax.set_title("Average precision for each class \n when training with augmented data")
     elif augmentation == False:
         ax.set_title("Average precision for each class \n when training without augmented data")
+    print(f"Best mAP:{max(data[-1])}, at epoch:{np.argmax(data[-1])}, aug={augmentation}")
     plt.legend()
     plt.savefig(f'plots/mAP_aug_{augmentation}.png')
     
@@ -180,6 +181,8 @@ def plot_average(dict_batches, dict_batches_aug, metric, nr_batches, all_batches
         plt.xlabel("Epoch")
         plt.ylabel(f"Average {metric}")
 
+        
+
     plt.legend()
     plt.title(f"Average {metric} when training")
     plt.savefig(f'plots/train_{metric}_.png')
@@ -206,6 +209,11 @@ def plot_val_metrics(data, data_aug, metric):
 
     plt.savefig(f'plots/val_{metric}.png')
 
+    # print mest metric and the metric value at best epoch (based on mAP)
+    print(f"Best {metric}:{max(data)}, at epoch:{np.argmax(data)+1}, aug=False")
+    print(f"Best {metric}:{max(data_aug)}, at epoch:{np.argmax(data_aug)+1}, aug=True")
+    print(f"{metric} at best mAP epoch:{data_aug[56]} (aug)")
+    print(f"{metric} at best mAP epoch:{data[57]} (NO aug) ")
 
 """
 dict_batches, nr_batches = read_loss(["log_files/loss_small_without_1.txt", 

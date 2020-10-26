@@ -12,6 +12,9 @@ for d1, d2, m in zip(val_data, val_data_aug, metric):
 AP, classes = read_map_data('lolboi/log_files/mAP.txt')
 plot_map(AP, classes, augmentation=True)
 
+AP, classes = read_map_data('lolboi/log_files/mAP_without.txt')
+plot_map(AP, classes, augmentation=False)
+
 
 
 dict_batches_aug, nr_batches = read_loss(['lolboi/log_files/loss.txt'], 25,37 )
@@ -25,6 +28,5 @@ plot_training_metric(dict_batches, dict_batches_aug, 'loss', nr_batches=nr_batch
 
 plt.figure()
 plot_average(dict_batches, dict_batches_aug, 'precision', nr_batches,  all_batches=False)
-
 
 plt.show()
